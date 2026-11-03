@@ -1,0 +1,5 @@
+# ADR-003: Classical models + LSA/BM25 retrieval instead of fine-tuned transformers / Vertex vector search
+**Status:** accepted for v2, revisit on real data
+**Context:** The only public telecom conversation data is tau2-bench (LLM-simulated, 2.7k conversations). Large models would overfit simulator style and cost far more to serve and audit.
+**Decision:** TF-IDF + LR (temperature-scaled) for issues, OvR for root causes, HGB for churn/resolution, char-n-gram LR + regex for injection, LSA embeddings with a hybrid BM25+LSA (RRF) retriever. Everything trains in minutes on CPU, is reproducible and explainable (feature weights).
+**Consequences:** Strong on tau2-like language (issue macro-F1 0.997 held-out) – this **overstates** performance on real customers. Sarcasm and subtle sentiment are weak (see KNOWN_LIMITS). The `Embedder`/`Retriever` interfaces are narrow so a Vertex embedding model + Vector Search can be swapped in; BigQuery vector search is the middle option. Do this once real labelled transcripts exist.

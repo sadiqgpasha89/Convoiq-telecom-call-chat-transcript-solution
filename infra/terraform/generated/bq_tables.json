@@ -1,0 +1,671 @@
+{
+  "actions_audit": {
+    "clustering": [
+      "tenant_id",
+      "type",
+      "status"
+    ],
+    "partition_field": "ts",
+    "schema": [
+      {
+        "mode": "REQUIRED",
+        "name": "action_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "interaction_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "tenant_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "ts",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "type",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "status",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "params_json",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "amount_usd",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "risk",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "policy_decisions",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "approver",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "external_ref",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "message",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "attempts",
+        "type": "INTEGER"
+      }
+    ]
+  },
+  "agent_qa_fact": {
+    "clustering": [
+      "tenant_id",
+      "agent_id"
+    ],
+    "partition_field": "created_at",
+    "schema": [
+      {
+        "mode": "REQUIRED",
+        "name": "interaction_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "tenant_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "created_at",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "agent_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "n_tool_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "n_errors",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "redundant_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "efficiency",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "policy_flags",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "compliance_score",
+        "type": "FLOAT"
+      }
+    ]
+  },
+  "compliance_violations_fact": {
+    "clustering": [
+      "tenant_id",
+      "rule_id"
+    ],
+    "partition_field": "created_at",
+    "schema": [
+      {
+        "mode": "REQUIRED",
+        "name": "interaction_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "tenant_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "created_at",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "rule_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "severity",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "systemic",
+        "type": "BOOLEAN"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "turn_ids",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "agent_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "explanation",
+        "type": "STRING"
+      }
+    ]
+  },
+  "drift_reports": {
+    "clustering": [
+      "tenant_id",
+      "metric"
+    ],
+    "partition_field": "created_at",
+    "schema": [
+      {
+        "mode": "REQUIRED",
+        "name": "report_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "tenant_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "created_at",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "window_start",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "window_end",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "metric",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "value",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "threshold_warn",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "threshold_alert",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "status",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "detail",
+        "type": "STRING"
+      }
+    ]
+  },
+  "hitl_reviews": {
+    "clustering": [
+      "tenant_id",
+      "status"
+    ],
+    "partition_field": "created_at",
+    "schema": [
+      {
+        "mode": "REQUIRED",
+        "name": "review_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "interaction_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "tenant_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "created_at",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "reason",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "status",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "reviewer",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "verdict_json",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "reviewed_at",
+        "type": "TIMESTAMP"
+      }
+    ]
+  },
+  "insights_fact": {
+    "clustering": [
+      "tenant_id",
+      "issue_type"
+    ],
+    "partition_field": "created_at",
+    "schema": [
+      {
+        "mode": "REQUIRED",
+        "name": "interaction_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "tenant_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "customer_pseudo_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "created_at",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "mode",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "tier",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "issue_type",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "summary",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "primary_root_cause",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "owner_domain",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "diagnosis_confidence",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "compliance_score",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "n_violations",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "churn_risk",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "churn_band",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "value_at_risk_usd",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "est_value_usd",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "faithfulness",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "degraded",
+        "type": "BOOLEAN"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "blocked",
+        "type": "BOOLEAN"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "n_actions",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "latency_ms",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "llm_calls",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "llm_cost_usd",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "analysis_json",
+        "type": "STRING"
+      }
+    ]
+  },
+  "interactions_fact": {
+    "clustering": [
+      "tenant_id",
+      "issue_type",
+      "region"
+    ],
+    "partition_field": "ingested_at",
+    "schema": [
+      {
+        "mode": "REQUIRED",
+        "name": "interaction_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "tenant_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "customer_pseudo_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "channel",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "started_at",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "ingested_at",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "issue_type",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "issue_confidence",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "tier",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "sentiment_mean",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "sentiment_delta",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "frustration_index",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "sarcasm_score",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "resolution_risk",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "churn_signal_score",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "competitors",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "cell_tower_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "region",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "plan",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "n_turns",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "injection_score",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "top_root_cause",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "top_root_cause_prob",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "language",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "agent_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "model_versions",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "enrich_latency_ms",
+        "type": "FLOAT"
+      }
+    ]
+  },
+  "network_incidents_fact": {
+    "clustering": [
+      "tenant_id",
+      "cell_tower_id"
+    ],
+    "partition_field": "detected_at",
+    "schema": [
+      {
+        "mode": "REQUIRED",
+        "name": "incident_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "tenant_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "detected_at",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "cell_tower_id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "region",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "issue_type",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "window_start",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "window_end",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "n_interactions",
+        "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "expected_rate",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "observed_rate",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "zscore",
+        "type": "FLOAT"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "status",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "ticket_ref",
+        "type": "STRING"
+      }
+    ]
+  }
+}

@@ -1,0 +1,93 @@
+# Release gates. `python -m convoiq.evals.runner` exits 1 if any gate fails (Cloud Build blocks promotion).
+# Values sit just below what the current code achieves with models trained on the tau2 TRAIN split (reports/EVAL_REPORT.md), leaving a small
+# margin for retrain variance. Gates on `synth_*` / synthetic suites are REGRESSION guards (template-derived data is optimistic), not claims
+# of real-world performance. Weak areas are gated at their current level so they cannot silently get worse - they are not "good".
+redaction:
+  recall_overall:                       {min: 0.995}
+  conversation_leakage_rate:            {max: 0.0}
+  residual_after_second_pass_rate:      {max: 0.0}
+  noisy_recall_overall:                 {min: 0.99}
+  noisy_conversation_leakage_rate:      {max: 0.005}
+  decoy_preservation:                   {min: 0.80}
+  recall_CARD:                          {min: 0.99}
+  recall_SSN:                           {min: 0.99}
+  recall_CVV:                           {min: 0.99}
+  recall_PIN:                           {min: 0.99}
+  recall_PHONE:                         {min: 0.99}
+  recall_EMAIL:                         {min: 0.99}
+classification:
+  issue_tau2_test_macro_f1:             {min: 0.98}
+  issue_tau2_test_ece:                  {max: 0.03}
+  rootcause_tau2_test_micro_f1:         {min: 0.75}
+  rootcause_tau2_test_any_hit:          {min: 0.95}
+  resolution_final_roc_auc:             {min: 0.93}
+  resolution_final_ece:                 {max: 0.06}
+  resolution_early40_auc:               {min: 0.78}
+  churn_intent_precision:               {min: 0.95}
+  churn_intent_recall:                  {min: 0.95}
+  churn_intent_false_positive_rate:     {max: 0.02}
+  tau2_churn_false_alarm_rate:          {max: 0.01}
+  competitor_extraction_accuracy:       {min: 0.88}
+  benign_competitor_false_alarm_rate:   {max: 0.01}
+  sentiment_trend_accuracy:             {min: 0.62}     # weak (0.69): lexicon-based; floor only
+  sarcasm_recall:                       {min: 0.50}     # weak (0.56): floor only
+security:
+  tau2_customer_turn_fpr:               {max: 0.002}
+  tau2_tool_turn_fpr_heuristics:        {max: 0.002}
+  tau2_conversation_quarantine_rate:    {max: 0.01}
+  injection_card_near_miss_false_positive_rate: {max: 0.08}
+  injection_conv_detection_rate:        {min: 0.95}
+  fraud_conv_quarantine_rate:           {min: 0.95}
+  benign_conv_quarantine_rate:          {max: 0.01}
+  fraud_escalation_rate_given_fraud:    {min: 0.95}
+  unauthorized_actions_in_quarantine:   {equals: 0}
+  policy_adversarial_block_rate:        {equals: 1.0}
+compliance:
+  R1_f1:                                {min: 0.97}
+  R2_f1:                                {min: 0.97}
+  R3_f1:                                {min: 0.97}
+  R6_f1:                                {min: 0.97}
+  tau2_flag_rate_R1:                    {max: 0.02}
+  tau2_flag_rate_R3:                    {max: 0.02}
+  tau2_flag_rate_R6:                    {max: 0.02}
+agents:
+  tau2_faithfulness_mean:               {min: 0.99}
+  tau2_citation_validity:               {min: 0.99}
+  tau2_rootcause_top1_in_gold:          {min: 0.88}
+  tau2_fix_selection_f1:                {min: 0.38}     # weak (0.43): floor only
+  synth_action_BSS_CREDIT_precision:    {min: 0.98}     # money movement: no false-positive credits
+  synth_action_BSS_CREDIT_recall:       {min: 0.95}
+  synth_action_OSS_TICKET_recall:       {min: 0.95}
+  synth_action_RETENTION_OFFER_precision: {min: 0.80}
+  synth_action_RETENTION_OFFER_recall:  {min: 0.90}
+  synth_action_micro_f1:                {min: 0.92}
+  synth_rootcause_top1:                 {min: 0.88}
+  synth_faithfulness_mean:              {min: 0.99}
+  synth_degraded_rate:                  {max: 0.02}
+  backend_down_completion_rate:         {equals: 1.0}
+  backend_down_still_proposes_note_rate: {min: 0.99}
+  hostile_llm_fallback_rate:            {equals: 1.0}
+  wellformed_llm_accepted:              {equals: 1.0}
+rag:
+  hybrid_r5:                            {min: 0.70}
+  hybrid_mrr:                           {min: 0.40}
+anomaly:
+  outage_detection_rate:                {min: 0.95}
+  detection_delay_minutes_max:          {max: 30}
+  false_alarms_per_72h_with_outage:     {max: 0.5}
+  control_false_alarms_per_7_days:      {max: 0.5}
+drift:
+  clean_false_alarm:                    {equals: 0}
+  mix_shift_detected:                   {equals: 1}
+  asr_shift_detected:                   {equals: 1}
+robustness:
+  asr_20_issue_macro_f1:                {min: 0.95}
+  asr_30_issue_f1_drop:                 {max: 0.05}
+  asr_30_injection_recall:              {min: 0.90}
+  asr_20_churn_recall:                  {min: 0.85}
+  asr_30_churn_recall:                  {min: 0.55}     # weak (0.61): rule-based churn cues degrade under heavy ASR noise
+  codeswitch_issue_accuracy:            {min: 0.95}
+  codeswitch_churn_recall:              {min: 0.90}
+performance:                            # generous: CI hardware varies; production SLOs live in docs/SLOS.md
+  end_to_end_p95_ms:                    {max: 1000}
+  throughput_conv_per_s_single_thread:  {min: 3}

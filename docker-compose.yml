@@ -1,0 +1,57 @@
+# Local full stack against the Pub/Sub + Firestore EMULATORS (no GCP account needed).
+#   cp .env.example .env && docker compose up --build        # first build trains the models (~4-5 min)
+#   python scripts/demo.py --base http://localhost:8080      # push sample conversations, print insights
+# Auth is disabled here on purpose: the emulator's push subscriptions cannot attach OIDC tokens. NEVER expose these ports.
+x-svc: &svc
+  build: { context: ., target: runtime }
+  image: convoiq:local
+  depends_on: [pubsub-init, firestore]
+  environment: &env
+    CONVOIQ_ENV: local
+    CONVOIQ_AUTH_MODE: none
+    CONVOIQ_GCP_PROJECT: convoiq-local
+    CONVOIQ_BUS_BACKEND: pubsub
+    CONVOIQ_STORE_BACKEND: firestore
+    CONVOIQ_WAREHOUSE_BACKEND: sqlite
+    CONVOIQ_SQLITE_PATH: /data/convoiq.db
+    CONVOIQ_CONNECTOR_MODE: simulated
+    CONVOIQ_LLM_PROVIDER: ${CONVOIQ_LLM_PROVIDER:-none}
+    CONVOIQ_PII_HMAC_KEY: ${CONVOIQ_PII_HMAC_KEY:-local-dev-hmac-key-0123456789}
+    PUBSUB_EMULATOR_HOST: pubsub:8085
+    FIRESTORE_EMULATOR_HOST: firestore:8086
+    CONVOIQ_REDACTION_URL: http://redaction:8080
+    CONVOIQ_ENRICHMENT_URL: http://enrichment:8080
+    CONVOIQ_ORCHESTRATOR_URL: http://orchestrator:8080
+    CONVOIQ_ACTION_BROKER_URL: http://action-broker:8080
+    CONVOIQ_ANALYTICS_URL: http://analytics:8080
+    CONVOIQ_MONITOR_URL: http://monitor:8080
+    CONVOIQ_TELECOM_SIM_URL: http://telecom-sim:8080
+  volumes: ["warehouse:/data"]
+  user: "10001"
+
+services:
+  pubsub:
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    command: gcloud beta emulators pubsub start --host-port=0.0.0.0:8085 --project=convoiq-local
+  firestore:
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    command: gcloud emulators firestore start --host-port=0.0.0.0:8086 --project=convoiq-local
+  pubsub-init:
+    <<: *svc
+    depends_on: [pubsub]
+    environment: { <<: *env }
+    entrypoint: ["python", "-c", "import runpy,sys; sys.path.insert(0,'/app'); runpy.run_path('/app/scripts/pubsub_emulator_init.py', run_name='__main__')"]
+    volumes: ["./scripts:/app/scripts:ro", "warehouse:/data"]
+    restart: "no"
+
+  gateway:       { <<: *svc, environment: { <<: *env, SERVICE: gateway },       ports: ["8080:8080"] }
+  redaction:     { <<: *svc, environment: { <<: *env, SERVICE: redaction } }
+  enrichment:    { <<: *svc, environment: { <<: *env, SERVICE: enrichment } }
+  orchestrator:  { <<: *svc, environment: { <<: *env, SERVICE: orchestrator } }
+  action-broker: { <<: *svc, environment: { <<: *env, SERVICE: action_broker } }
+  analytics:     { <<: *svc, environment: { <<: *env, SERVICE: analytics } }
+  monitor:       { <<: *svc, environment: { <<: *env, SERVICE: monitor } }
+  telecom-sim:   { <<: *svc, environment: { <<: *env, SERVICE: telecom_sim }, ports: ["8090:8080"] }
+
+volumes:
+  warehouse: {}

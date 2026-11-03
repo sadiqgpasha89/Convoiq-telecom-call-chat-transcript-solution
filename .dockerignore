@@ -1,0 +1,14 @@
+.git
+.github
+**/__pycache__
+*.pyc
+.env
+.venv
+src
+docs
+reports
+models
+models_eval
+infra/terraform/.terraform
+*.md
+!README.md

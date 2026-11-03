@@ -1,0 +1,78 @@
+# Cloud Build: test -> eval gate -> build -> canary release with automatic rollback.
+#   gcloud builds submit --config cloudbuild.yaml --substitutions=_ENV=dev .
+# The build service account needs: Artifact Registry Writer, Cloud Run Admin, Service Account User (on the service SAs),
+# Storage Object Admin on the artifacts bucket, Monitoring Viewer (canary check). See docs/RUNBOOK.md#ci-permissions.
+substitutions:
+  _ENV: dev
+  _REGION: us-central1
+  _CANARY_PCT: "10"
+  _CANARY_WAIT_S: "300"
+  _SKIP_EVAL: "false"
+options:
+  machineType: E2_HIGHCPU_8
+  logging: CLOUD_LOGGING_ONLY
+timeout: 3600s
+
+steps:
+  # 1. CI image = code + models trained in the image + tests (layers shared with the runtime build below)
+  - id: build-ci
+    name: gcr.io/cloud-builders/docker
+    env: ["DOCKER_BUILDKIT=1"]
+    args: ["build", "--target", "ci", "--cache-from", "${_REGION}-docker.pkg.dev/$PROJECT_ID/convoiq/convoiq:cache",
+           "--build-arg", "BUILDKIT_INLINE_CACHE=1", "-t", "convoiq-ci", "."]
+
+  # 2. unit/integration/e2e tests + infra drift check (generated Terraform inputs must match the code)
+  - id: tests
+    name: gcr.io/cloud-builders/docker
+    waitFor: ["build-ci"]
+    entrypoint: bash
+    args: ["-c", "docker run --rm convoiq-ci sh -c 'python scripts/gen_infra.py --check && python -m pytest tests/v2 -q'"]
+
+  # 3. eval gate: models trained on the tau2 TRAIN split only, scored on the held-out test split; thresholds in evals/thresholds.yaml
+  - id: eval-gate
+    name: gcr.io/cloud-builders/docker
+    waitFor: ["build-ci"]
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        if [ "${_SKIP_EVAL}" = "true" ]; then echo "eval gate skipped (explicit)"; exit 0; fi
+        mkdir -p /workspace/reports && chmod 777 /workspace/reports
+        docker run --rm -v /workspace/reports:/app/reports convoiq-ci sh -c \
+          'python -m convoiq.training.train_all --split train --out models_eval && python -m convoiq.evals.runner --models models_eval --out reports'
+
+  - id: publish-eval-report
+    name: gcr.io/cloud-builders/gsutil
+    waitFor: ["eval-gate"]
+    entrypoint: bash
+    args: ["-c", "[ -d /workspace/reports ] && gsutil -m cp -r /workspace/reports gs://$PROJECT_ID-convoiq-artifacts/eval/$BUILD_ID/ || true"]
+
+  # 4. runtime image (cache-hit on the shared stages), pushed by digest-able tag
+  - id: build-runtime
+    name: gcr.io/cloud-builders/docker
+    waitFor: ["tests", "eval-gate"]
+    env: ["DOCKER_BUILDKIT=1"]
+    args: ["build", "--target", "runtime", "--cache-from", "convoiq-ci",
+           "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/convoiq/convoiq:$BUILD_ID",
+           "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/convoiq/convoiq:cache", "."]
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    waitFor: ["build-runtime"]
+    args: ["push", "--all-tags", "${_REGION}-docker.pkg.dev/$PROJECT_ID/convoiq/convoiq"]
+
+  # 5. canary: new revisions get 0 % -> ${_CANARY_PCT} % -> health check on real traffic -> 100 %, or automatic rollback
+  - id: release
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    waitFor: ["push"]
+    entrypoint: bash
+    env:
+      - PROJECT=$PROJECT_ID
+      - REGION=${_REGION}
+      - ENV=${_ENV}
+      - IMAGE=${_REGION}-docker.pkg.dev/$PROJECT_ID/convoiq/convoiq:$BUILD_ID
+      - CANARY_PCT=${_CANARY_PCT}
+      - CANARY_WAIT_S=${_CANARY_WAIT_S}
+    args: ["scripts/release.sh"]
+
+images:
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/convoiq/convoiq:$BUILD_ID"

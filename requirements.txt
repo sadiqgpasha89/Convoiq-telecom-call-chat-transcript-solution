@@ -1,0 +1,21 @@
+# Runtime dependencies. Versions marked (T) were exercised by the test-suite and eval runs in this repo's CI image;
+# cloud client libraries are ranges because they could not be exercised outside GCP (see docs/KNOWN_LIMITS.md).
+fastapi==0.146.0            # (T)
+pydantic==2.13.5            # (T)
+uvicorn[standard]>=0.34
+httpx>=0.28
+numpy==2.5.3                # (T)
+scipy==1.18.1               # (T)
+pandas==3.0.5               # (T) training only
+scikit-learn==1.9.1         # (T) - models are trained at image build time with this exact version
+joblib==1.6.0               # (T)
+cryptography>=43
+pyyaml>=6
+# --- GCP clients ---------------------------------------------------------------------------------------------
+google-auth>=2.35
+google-cloud-pubsub>=2.26
+google-cloud-bigquery>=3.26
+google-cloud-firestore>=2.19
+google-genai>=1.0           # Vertex AI Gemini (optional, LLM_PROVIDER=vertex)
+# --- optional LLM provider -----------------------------------------------------------------------------------
+anthropic>=0.50             # optional, LLM_PROVIDER=anthropic

@@ -1,0 +1,122 @@
+{
+  "max_delivery_attempts": 5,
+  "publishers": {
+    "convoiq-actions-proposed": [
+      "orchestrator",
+      "monitor"
+    ],
+    "convoiq-actions-result": [
+      "action-broker"
+    ],
+    "convoiq-dead-letter": [
+      "gateway",
+      "redaction",
+      "enrichment",
+      "orchestrator",
+      "action-broker",
+      "analytics",
+      "monitor"
+    ],
+    "convoiq-incidents": [
+      "monitor"
+    ],
+    "convoiq-interactions-analyzed": [
+      "orchestrator"
+    ],
+    "convoiq-interactions-enriched": [
+      "enrichment"
+    ],
+    "convoiq-interactions-raw": [
+      "gateway"
+    ],
+    "convoiq-interactions-redacted": [
+      "gateway",
+      "redaction"
+    ]
+  },
+  "services": {
+    "action-broker": "action_broker",
+    "analytics": "analytics",
+    "enrichment": "enrichment",
+    "gateway": "gateway",
+    "monitor": "monitor",
+    "orchestrator": "orchestrator",
+    "redaction": "redaction",
+    "telecom-sim": "telecom_sim"
+  },
+  "subscriptions": [
+    {
+      "ack_deadline_s": 60,
+      "name": "redaction-raw",
+      "path": "/pubsub/raw",
+      "service": "redaction",
+      "topic": "convoiq-interactions-raw"
+    },
+    {
+      "ack_deadline_s": 60,
+      "name": "enrichment-redacted",
+      "path": "/pubsub/redacted",
+      "service": "enrichment",
+      "topic": "convoiq-interactions-redacted"
+    },
+    {
+      "ack_deadline_s": 120,
+      "name": "orchestrator-enriched",
+      "path": "/pubsub/enriched",
+      "service": "orchestrator",
+      "topic": "convoiq-interactions-enriched"
+    },
+    {
+      "ack_deadline_s": 60,
+      "name": "analytics-enriched",
+      "path": "/pubsub/enriched",
+      "service": "analytics",
+      "topic": "convoiq-interactions-enriched"
+    },
+    {
+      "ack_deadline_s": 30,
+      "name": "monitor-enriched",
+      "path": "/pubsub/enriched",
+      "service": "monitor",
+      "topic": "convoiq-interactions-enriched"
+    },
+    {
+      "ack_deadline_s": 60,
+      "name": "analytics-analyzed",
+      "path": "/pubsub/analyzed",
+      "service": "analytics",
+      "topic": "convoiq-interactions-analyzed"
+    },
+    {
+      "ack_deadline_s": 120,
+      "name": "broker-actions",
+      "path": "/pubsub/actions",
+      "service": "action-broker",
+      "topic": "convoiq-actions-proposed"
+    },
+    {
+      "ack_deadline_s": 60,
+      "name": "analytics-actions-result",
+      "path": "/pubsub/actions-result",
+      "service": "analytics",
+      "topic": "convoiq-actions-result"
+    },
+    {
+      "ack_deadline_s": 60,
+      "name": "analytics-incidents",
+      "path": "/pubsub/incidents",
+      "service": "analytics",
+      "topic": "convoiq-incidents"
+    }
+  ],
+  "topics": [
+    "convoiq-interactions-raw",
+    "convoiq-interactions-redacted",
+    "convoiq-interactions-enriched",
+    "convoiq-interactions-analyzed",
+    "convoiq-actions-proposed",
+    "convoiq-actions-result",
+    "convoiq-incidents",
+    "convoiq-dead-letter"
+  ]
+}

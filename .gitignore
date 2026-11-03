@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+.pytest_cache/
+.ruff_cache/
+# trained artefacts are rebuilt by `make train` / the Docker build; never commit them
+models/
+models_eval/
+# terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate*
+infra/terraform/*.auto.tfvars
+infra/terraform/crash.log
+data/
+reports/
+evals/*.json
+*.egg-info/
+.coverage
